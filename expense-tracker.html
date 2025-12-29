@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Expense Tracker 💑</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Press Start 2P', cursive;
+            image-rendering: pixelated;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.6;
+        }
+
+        .pixel-bg {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSI0MCIgZmlsbD0iI2UwZTBlMCIvPjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSIxIiBmaWxsPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+');
+        }
+
+        .pixel-border {
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+        }
+
+        .pixel-button {
+            border: 3px solid #000;
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.4);
+            transition: all 0.1s;
+        }
+
+        .pixel-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
+        }
+
+        .pixel-button:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.4);
+        }
+
+        input,
+        select {
+            border: 3px solid #000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+        }
+
+        .bg-scene {
+            background: linear-gradient(to bottom,
+                    #87CEEB 0%,
+                    #87CEEB 60%,
+                    #98D8C8 60%,
+                    #6BCF7F 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.8;
+        }
+
+        .pixel-text-sm {
+            font-size: 8px;
+            line-height: 1.8;
+        }
+
+        .pixel-text-base {
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .pixel-text-lg {
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .pixel-text-xl {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 640px) {
+            .pixel-text-sm {
+                font-size: 7px;
+            }
+
+            .pixel-text-base {
+                font-size: 9px;
+            }
+
+            .pixel-text-lg {
+                font-size: 11px;
+            }
+
+            input,
+            select {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Heart = ({ className }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+        );
+
+        const Plus = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+        );
+
+        const Download = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+        );
+
+        const Upload = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+        );
+
+        const Trash2 = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+        );
+
+        function ExpenseTracker() {
+            const [expenses, setExpenses] = useState([]);
+            const [person1, setPerson1] = useState('');
+            const [person2, setPerson2] = useState('');
+            const [namesConfirmed, setNamesConfirmed] = useState(false);
+            const [loading, setLoading] = useState(true);
+            const [showForm, setShowForm] = useState(false);
+
+            const [formData, setFormData] = useState({
+                date: new Date().toISOString().split('T')[0],
+                description: '',
+                amount: '',
+                paidBy: '',
+                settled: false
+            });
+
+            useEffect(() => {
+                loadData();
+            }, []);
+
+            const loadData = () => {
+                try {
+                    const savedNames = localStorage.getItem('couple-names');
+                    const savedExpenses = localStorage.getItem('couple-expenses');
+
+                    if (savedNames) {
+                        const names = JSON.parse(savedNames);
+                        setPerson1(names.person1);
+                        setPerson2(names.person2);
+                        setNamesConfirmed(true);
+                    }
+
+                    if (savedExpenses) {
+                        setExpenses(JSON.parse(savedExpenses));
+                    }
+                } catch (error) {
+                    console.log('No existing data, starting fresh');
+                }
+                setLoading(false);
+            };
+
+            const saveData = (newExpenses, name1, name2) => {
+                try {
+                    localStorage.setItem('couple-names', JSON.stringify({
+                        person1: name1 || person1,
+                        person2: name2 || person2
+                    }));
+                    localStorage.setItem('couple-expenses', JSON.stringify(newExpenses));
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    alert('Failed to save data!');
+                }
+            };
+
+            const calculateBalance = () => {
+                if (!person1 || !person2) return { person1Paid: 0, person2Paid: 0, whoOwes: '', amount: 0 };
+
+                const person1Paid = expenses.filter(e => !e.settled && e.paidBy === person1).reduce((sum, e) => sum + parseFloat(e.amount), 0);
+                const person2Paid = expenses.filter(e => !e.settled && e.paidBy === person2).reduce((sum, e) => sum + parseFloat(e.amount), 0);
+
+                const total = person1Paid + person2Paid;
+                const halfEach = total / 2;
+
+                let whoOwes = '';
+                let amount = 0;
+
+                if (person1Paid > halfEach) {
+                    whoOwes = person2;
+                    amount = person1Paid - halfEach;
+                } else if (person2Paid > halfEach) {
+                    whoOwes = person1;
+                    amount = person2Paid - halfEach;
+                }
+
+                return { person1Paid, person2Paid, whoOwes, amount };
+            };
+
+            const groupExpensesByDate = () => {
+                const grouped = {};
+                expenses.forEach(expense => {
+                    if (!grouped[expense.date]) {
+                        grouped[expense.date] = [];
+                    }
+                    grouped[expense.date].push(expense);
+                });
+                return Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).map(date => ({
+                    date,
+                    expenses: grouped[date]
+                }));
+            };
+
+            const addExpense = () => {
+                if (!formData.description || !formData.amount || !formData.paidBy) {
+                    alert('Fill all fields!');
+                    return;
+                }
+
+                const newExpense = {
+                    ...formData,
+                    id: Date.now(),
+                    amount: parseFloat(formData.amount)
+                };
+
+                const newExpenses = [newExpense, ...expenses];
+                setExpenses(newExpenses);
+                saveData(newExpenses);
+
+                setFormData({
+                    date: new Date().toISOString().split('T')[0],
+                    description: '',
+                    amount: '',
+                    paidBy: formData.paidBy,
+                    settled: false
+                });
+                setShowForm(false);
+            };
+
+            const toggleSettled = (id) => {
+                const newExpenses = expenses.map(e =>
+                    e.id === id ? { ...e, settled: !e.settled } : e
+                );
+                setExpenses(newExpenses);
+                saveData(newExpenses);
+            };
+
+            const deleteExpense = (id) => {
+                if (confirm('Delete this expense?')) {
+                    const newExpenses = expenses.filter(e => e.id !== id);
+                    setExpenses(newExpenses);
+                    saveData(newExpenses);
+                }
+            };
+
+            const exportToExcel = () => {
+                const csvContent = [
+                    ['Date', 'Description', 'Amount', 'Paid By', 'Settled'],
+                    ...expenses.map(e => [e.date, e.description, e.amount, e.paidBy, e.settled ? 'Yes' : 'No'])
+                ].map(row => row.join(',')).join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `expenses-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+            };
+
+            const importFromExcel = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const text = event.target.result;
+                    const rows = text.split('\n').slice(1);
+                    const imported = rows.filter(row => row.trim()).map((row, idx) => {
+                        const [date, description, amount, paidBy, settled] = row.split(',');
+                        return {
+                            id: Date.now() + idx,
+                            date,
+                            description,
+                            amount: parseFloat(amount),
+                            paidBy,
+                            settled: settled?.trim().toLowerCase() === 'yes'
+                        };
+                    });
+
+                    const newExpenses = [...imported, ...expenses];
+                    setExpenses(newExpenses);
+                    saveData(newExpenses);
+                    alert(`Imported ${imported.length} expenses!`);
+                };
+                reader.readAsText(file);
+            };
+
+            const confirmNames = () => {
+                if (person1 && person2) {
+                    setNamesConfirmed(true);
+                    saveData(expenses, person1, person2);
+                }
+            };
+
+            const balance = calculateBalance();
+            const groupedExpenses = groupExpensesByDate();
+
+            if (loading) {
+                return (
+                    <div className="min-h-screen bg-scene flex items-center justify-center">
+                        <div className="pixel-text-xl text-white pixel-border bg-black px-6 py-4">Loading...</div>
+                    </div>
+                );
+            }
+
+            if (!namesConfirmed) {
+                return (
+                    <div className="min-h-screen bg-scene flex items-center justify-center p-4">
+                        <div className="pixel-bg pixel-border bg-white p-8 max-w-md w-full">
+                            <div className="text-center mb-6">
+                                <Heart className="w-12 h-12 text-pink-500 mx-auto mb-4" />
+                                <h1 className="pixel-text-lg text-gray-800 mb-4">OUR EXPENSE TRACKER</h1>
+                                <p className="pixel-text-sm text-gray-600">Enter your names!</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <input
+                                    type="text"
+                                    placeholder="Player 1"
+                                    value={person1}
+                                    onChange={(e) => setPerson1(e.target.value)}
+                                    className="w-full px-4 py-3 pixel-text-sm bg-pink-50 focus:bg-pink-100 focus:outline-none"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Player 2"
+                                    value={person2}
+                                    onChange={(e) => setPerson2(e.target.value)}
+                                    className="w-full px-4 py-3 pixel-text-sm bg-purple-50 focus:bg-purple-100 focus:outline-none"
+                                />
+                                <button
+                                    onClick={confirmNames}
+                                    disabled={!person1 || !person2}
+                                    className="w-full bg-green-500 text-white py-3 pixel-text-sm font-bold hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed pixel-button"
+                                >
+                                    START GAME!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-scene p-4">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="pixel-bg pixel-border bg-white p-6 mb-6">
+                            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+                                <h1 className="pixel-text-lg text-gray-800 flex items-center gap-2">
+                                    <Heart className="text-pink-500 w-6 h-6" />
+                                    OUR EXPENSES
+                                </h1>
+                                <div className="flex gap-2">
+                                    <button onClick={exportToExcel} className="p-2 bg-green-400 pixel-button hover:bg-green-500" title="Download CSV">
+                                        <Download className="w-5 h-5" />
+                                    </button>
+                                    <label className="p-2 bg-blue-400 pixel-button hover:bg-blue-500 cursor-pointer" title="Upload CSV">
+                                        <Upload className="w-5 h-5" />
+                                        <input type="file" accept=".csv" onChange={importFromExcel} className="hidden" />
+                                    </label>
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Reset everything? This will delete all data!')) {
+                                                localStorage.clear();
+                                                window.location.reload();
+                                            }
+                                        }}
+                                        className="p-2 bg-red-400 pixel-button hover:bg-red-500"
+                                        title="Reset All Data"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                            <path d="M21 3v5h-5" />
+                                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                                            <path d="M3 21v-5h5" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="bg-yellow-100 pixel-border p-6 mb-4">
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <div className="text-center">
+                                        <div className="pixel-text-sm text-gray-600 mb-2">{person1}</div>
+                                        <div className="pixel-text-lg font-bold text-pink-600">₹{balance.person1Paid.toFixed(2)}</div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="pixel-text-sm text-gray-600 mb-2">{person2}</div>
+                                        <div className="pixel-text-lg font-bold text-purple-600">₹{balance.person2Paid.toFixed(2)}</div>
+                                    </div>
+                                </div>
+
+                                {balance.amount > 0 && (
+                                    <div className="text-center bg-white pixel-border p-4">
+                                        <div className="pixel-text-sm font-bold text-gray-800">
+                                            <span className="text-red-500">{balance.whoOwes}</span>
+                                            <br />
+                                            OWES
+                                            <br />
+                                            <span className="text-green-500">₹{balance.amount.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {balance.amount === 0 && expenses.filter(e => !e.settled).length > 0 && (
+                                    <div className="text-center bg-white pixel-border p-4">
+                                        <div className="pixel-text-sm font-bold text-green-600">ALL EVEN!</div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {!showForm && (
+                            <button
+                                onClick={() => setShowForm(true)}
+                                className="w-full bg-pink-500 text-white py-4 pixel-text-base font-bold mb-6 hover:bg-pink-600 pixel-button flex items-center justify-center gap-3"
+                            >
+                                <Plus className="w-6 h-6" />
+                                ADD EXPENSE
+                            </button>
+                        )}
+
+                        {showForm && (
+                            <div className="pixel-bg pixel-border bg-white p-6 mb-6">
+                                <h2 className="pixel-text-base font-bold text-gray-800 mb-4">NEW EXPENSE</h2>
+                                <div className="space-y-4">
+                                    <input
+                                        type="date"
+                                        value={formData.date}
+                                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-50 focus:bg-gray-100 focus:outline-none"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="What for?"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-50 focus:bg-gray-100 focus:outline-none"
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="Amount"
+                                        value={formData.amount}
+                                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-50 focus:bg-gray-100 focus:outline-none"
+                                    />
+                                    <select
+                                        value={formData.paidBy}
+                                        onChange={(e) => setFormData({ ...formData, paidBy: e.target.value })}
+                                        className="w-full px-4 py-3 bg-gray-50 focus:bg-gray-100 focus:outline-none"
+                                    >
+                                        <option value="">Who paid?</option>
+                                        <option value={person1}>{person1}</option>
+                                        <option value={person2}>{person2}</option>
+                                    </select>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={addExpense}
+                                            className="flex-1 bg-green-500 text-white py-3 pixel-text-sm font-bold hover:bg-green-600 pixel-button"
+                                        >
+                                            ADD
+                                        </button>
+                                        <button
+                                            onClick={() => setShowForm(false)}
+                                            className="px-6 bg-red-500 text-white py-3 pixel-text-sm font-bold hover:bg-red-600 pixel-button"
+                                        >
+                                            CANCEL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-6">
+                            {expenses.length === 0 ? (
+                                <div className="pixel-bg pixel-border bg-white p-8 text-center">
+                                    <p className="pixel-text-sm text-gray-500">NO EXPENSES YET!</p>
+                                </div>
+                            ) : (
+                                groupedExpenses.map(group => (
+                                    <div key={group.date}>
+                                        <div className="bg-blue-500 text-white pixel-border px-4 py-2 mb-3">
+                                            <h3 className="pixel-text-base font-bold">{new Date(group.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</h3>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {group.expenses.map(expense => (
+                                                <div
+                                                    key={expense.id}
+                                                    className={`pixel-bg pixel-border bg-white p-4 ${expense.settled ? 'opacity-50' : ''}`}
+                                                >
+                                                    <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                                                        <div className="flex-1 min-w-0 w-full">
+                                                            <div className={`pixel-text-base font-bold mb-2 ${expense.settled ? 'line-through text-gray-400' : 'text-gray-800'} break-words`}>
+                                                                {expense.description}
+                                                            </div>
+                                                            <div className="pixel-text-sm text-gray-600">
+                                                                BY:{' '}
+                                                                <span className={expense.paidBy === person1 ? 'text-pink-600 font-bold' : 'text-purple-600 font-bold'}>
+                                                                    {expense.paidBy}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex sm:flex-col items-center sm:items-end gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                                                            <div className={`pixel-text-lg font-bold ${expense.settled ? 'text-gray-400' : 'text-green-600'}`}>
+                                                                ₹{expense.amount.toFixed(2)}
+                                                            </div>
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={() => toggleSettled(expense.id)}
+                                                                    className={`px-3 py-2 pixel-text-sm font-bold pixel-button ${expense.settled
+                                                                            ? 'bg-yellow-400 hover:bg-yellow-500'
+                                                                            : 'bg-green-400 hover:bg-green-500'
+                                                                        }`}
+                                                                >
+                                                                    {expense.settled ? 'UNDO' : 'PAID'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => deleteExpense(expense.id)}
+                                                                    className="p-2 bg-red-400 hover:bg-red-500 pixel-button"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<ExpenseTracker />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
